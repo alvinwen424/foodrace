@@ -19,8 +19,8 @@ const LATITUDE_DELTA = 0.0922
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO
 
 function inRadius(marker, position){
-  if (position.latitude + .002 > marker.latitude && position.latitude - .002 < marker.latitude){
-    if(position.longitude + .002 > marker.longitude && position.longitude - .002 < marker.longitude){
+  if (position.latitude + .001 > marker.latitude && position.latitude - .001 < marker.latitude){
+    if(position.longitude + .001 > marker.longitude && position.longitude - .001 < marker.longitude){
       return true;
     }
   }
@@ -42,10 +42,16 @@ export default class viewMap extends Component {
                 longitude: 0,
             },
             targetPosition:{
-              latitude: 40.7050, 
-              longitude: -74.0089
+              latitude: 0, 
+              longitude: 0
             },
-            lines: []
+            unMarkedPositions: [
+                {latitude: 40.7105, longitude: -74.0089, id: 1},
+                {latitude: 40.7068, longitude: -74.0069, id: 2}
+                ],
+            lines: [],
+            counter: 0,
+
         }
     }
 
@@ -62,8 +68,25 @@ export default class viewMap extends Component {
             latitudeDelta: LATITUDE_DELTA,
             longitudeDelta: LONGITUDE_DELTA,
         }
-
-        this.setState({initialPosition: initialRegion, markerPosition: initialRegion})
+        var firstPosition = {
+          latitude: lat,
+          longitude: long,
+          id: 0
+        }
+        if (!this.state.targetPosition.latitude && !this.state.targetPosition.longitude){
+            this.state.targetPosition = this.state.unMarkedPositions[0];
+            this.state.counter++;
+        }
+        const nextState = {initialPosition: initialRegion, markerPosition: initialRegion}
+        if (!this.state.lines[0]){
+          this.state.lines.push(firstPosition)
+          this.state.unMarkedPositions.push({
+            latitude: lat,
+            longitude: long,
+            id: this.state.unMarkedPositions.length
+            })
+        }
+        this.setState(nextState)
     },
     (error) => alert(JSON.stringify(error)),
     {enableHighAccuracy: true, timeout: 20000, maxiumumAge: 1000 })
@@ -81,9 +104,9 @@ export default class viewMap extends Component {
         const nextState = {initialPosition: lastRegion, markerPosition: lastRegion};
         if (inRadius(this.state.targetPosition, lastRegion)){
           nextState.lines = [...this.state.lines, this.state.targetPosition];
-          nextState.targetPosition = {latitude: 40.7090, longitude: -74.0040}; 
+          nextState.targetPosition = this.state.unMarkedPositions[this.state.counter];
+          this.state.counter++; 
         }
-
         this.setState(nextState)
     })
   }
@@ -93,6 +116,7 @@ export default class viewMap extends Component {
   }
 
     render(){
+        let lines = this.state.lines
         return(
             <View style={styles.container}>
                 <MapView
@@ -101,7 +125,37 @@ export default class viewMap extends Component {
                     <MapView.Marker
                         coordinate={this.state.targetPosition}>
                     </MapView.Marker>
-
+                    { 
+                        ((this.state.counter > 1) && lines.map(line =>{
+                            let nLine1 = lines.find(eline => eline.id == line.id)
+                            let nLine2 = lines.find(eline => eline.id == line.id-1)
+                            if (!nLine1 || !nLine2 ){
+                                return (
+                                <MapView.Polyline
+                                    coordinates={[
+                                        {latitude: 0, longitude: 0},
+                                        {latitude: 0, longitude: 0},
+                                    ]}                            //this part is broken
+                                    strokeColor='red'
+                                    strokeWidth={5}
+                                />
+                            )
+                            }
+                            console.log("line1", nLine1)
+                            console.log("line2", nLine2)
+                            return (
+                                <MapView.Polyline
+                                    coordinates={[
+                                        {latitude: nLine2.latitude, longitude: nLine2.longitude},
+                                        {latitude: nLine1.latitude, longitude: nLine1.longitude},
+                                    ]}                            //this part is broken
+                                    strokeColor='red'
+                                    strokeWidth={5}
+                                />
+                            )
+                            })
+                        )
+                    }
                     <MapView.Marker
                         coordinate={this.state.markerPosition}>
                         <View style={styles.radius}>
@@ -152,19 +206,12 @@ const styles = StyleSheet.create({
 });
 
 /*
-                    <MapView.Polygon
-                        coordinates={[
-                          {latitude: 40.7070, longitude: -74.0117},
-                          {latitude: 40.7058, longitude: -74.0040},
-                          {latitude: 40.7078, longitude: -74.0028},
-                        ]}
-                        //instead of erasing the line, generate the line by having them walk to specific coordinates
-                        strokeColor='red'
-                        strokeWidth={5}
-                    />*/
+*/
 
 // drop marker
 //if geolocation hits marker, draw line from original location to marker
 //
 //erase marker
 //pop up new marker
+                // {latitude: 40.7096, longitude: -74.0117, id: 1},
+                // {latitude: 40.7100, longitude: -74.0066, id: 2}
