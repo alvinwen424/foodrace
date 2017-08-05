@@ -112,10 +112,11 @@ export default class viewMap extends Component {
   }
 
   componentWillUnmount(){
-    navigator.geolocaiton.clearWatch(this.watchID)
+    navigator.geolocation.clearWatch(this.watchID)
   }
 
     render(){
+        console.log("reached the map component")
         let lines = this.state.lines
         return(
             <View style={styles.container}>
