@@ -7,7 +7,7 @@ import {
   Text,
   TouchableOpacity,
   View,
-  NavigatorIOS
+  NavigatorIOS,
 } from 'react-native';
 
 import { WebBrowser } from 'expo';
@@ -15,6 +15,10 @@ import { WebBrowser } from 'expo';
 import { MonoText } from '../components/StyledText';
 
 import viewMap from "./viewMap"
+import {Pizza} from "../components/Pizza"
+import Hamburger from "../components/Hamburger"
+import IceCream from "../components/IceCream"
+
 
 import Button from 'apsl-react-native-button'
 
@@ -27,7 +31,21 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom:0,
     left:0
-  }
+  },
+  container: {
+    flex: 1,
+    width: undefined,
+    height: undefined,
+    backgroundColor:'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  creator: {
+    backgroundColor: "transparent",
+    bottom:0,
+    left:10,
+    justifyContent: 'center',
+  },
 }) 
 
 //---------------------------------------------------------------------------------
@@ -69,7 +87,7 @@ export default class HomeScreen extends Component {
   static navigationOptions = {
     header: null,
   };
-  
+
   render() {
     return (
       <NavigatorIOS
@@ -78,7 +96,8 @@ export default class HomeScreen extends Component {
             title: 'Food Runner App',
         }}
         style={{flex: 1}}
-      />)
+      />
+      )
     }
 }
 
@@ -105,25 +124,22 @@ render(){
     }
       
   return(
+      <Image
+        source={require('../frontpageBackground.jpg')}
+        style={styles.container}>
        <View>
-        <Text></Text>
-        <Text></Text>
-        <Text></Text>
-        <Text></Text>
-        <Text></Text>
-        <Text></Text>
-        <Text>THIS IS THE FOURSQUARE API:</Text>
-
-
+      
          <Button
-           style = {{backgroundColor: "orange", borderColor: "orange"}}
-           textStyle={{fontSize: 18}}
-           onPress = {this._onForward}>
-           Start!
-          </Button>
-        
+           title = "Start"
+           style = {styles.startButton}
+           onPress = {this._onForward}
+        /> 
+      <Text style={styles.creator}>
+        Created By The A Team(Alvin and Aatish)
+      </Text>
 
       </View>
+      </Image>
   )
 }
 }
@@ -139,20 +155,25 @@ export class LoadPictures extends Component{
   static propTypes = {
     navigator: PropTypes.object.isRequired
   }
-  _onForward = () => {
+  _onForward = (thing) => {
     console.log("reached the on forward component")
     this.props.navigator.push({
-        component: viewMap
+        component: thing
     })
   }
 
 render(){
   return(
+    <Image
+      source={require('../frontpageBackground.jpg')}
+      style={styles.container}>
     <View>
         <ScrollView>
         
-        <TouchableOpacity onPress={this._onForward}>
-          <Image style={{width: 400, height: 200, borderRadius: 30, marginLeft:20, marginRight:20,  marginTop:10}} source={{uri: "http://zacharys.com/wp-content/uploads/2014/04/PizzaThinTomBasil_12.jpg"}}>
+
+        <TouchableOpacity onPress={() => this._onForward(Pizza)}>
+          <Image style={{width: 400, height: 200, borderRadius: 30, marginLeft:20, marginRight:20,  marginTop:10}} source={{uri: "http://zacharys.com/wp-content/uploads/2014/04/PizzaThinTomBasil_12.jpg"}} onPress = {this._onForward}>
+
           
             <View style={{ paddingTop: 60, width: 320, height: 120}}>
                 <Text style={{fontSize: 20, textAlign: 'center', backgroundColor: 'blue', color: 'white', marginTop: 40}}> Pizza </Text>
@@ -161,28 +182,36 @@ render(){
           </Image>
         </TouchableOpacity>
         
-        <TouchableOpacity onPress={this._onForward}>
+
+      <TouchableOpacity onPress={() => this._onForward(Hamburger)}>
+
         <Image style={{width: 400, height: 200, borderRadius: 30, marginRight:20, marginLeft:20, marginTop:10}} source={{uri: "https://assets.culvers.com/menu-item-images/200/web-butter-burger-deluxe-double-bacon.jpg"}}> 
-          
           <View style={{ paddingTop: 60, width: 320, height: 120}}>
             <Text style={{fontSize: 20, textAlign: 'center', backgroundColor: 'blue', color: 'white', marginTop: 40}}> Burger </Text>
           </View>
         
         </Image>
-        </TouchableOpacity>
 
-        <TouchableOpacity onPress={this._onForward}>
-        <Image style={{width: 400, height: 200, borderRadius: 30, marginRight:20, marginLeft:20, marginTop:5}} source={{uri: "https://visitmontgomery.com/wp-content/uploads/2015/06/Header-Art-01.jpg"}}  onPress = {this._onForward}>
+      </TouchableOpacity>
+
+        
+    <TouchableOpacity onPress={() => this._onForward(IceCream)}>
+
+        <Image style={{width: 400, height: 200, borderRadius: 30, marginRight:20, marginLeft:20, marginTop:10}} source={{uri: "https://visitmontgomery.com/wp-content/uploads/2015/06/Header-Art-01.jpg"}}>
+
             
             <View style={{ paddingTop: 60, width: 320, height: 120, marginBottom: 10}}>
                 <Text style={{fontSize: 20, textAlign: 'center', backgroundColor: 'blue', color: 'white'}}> Ice Cream </Text>
               </View>
 
         </Image>
-        </TouchableOpacity>
+
+    </TouchableOpacity>
+
 
         </ScrollView>
-        </View>
+    </View>
+    </Image>
   )
 }}
 
